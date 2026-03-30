@@ -1,42 +1,29 @@
-import ollama
-def analyze_meeting(meeting_text):
-    prompt = f"""
-    You are a strict meeting analysis system.
+from audio_agent import AudioAgent
+from agent import AnalysisAgent
 
-    Your job is to analyze meeting transcripts and ALWAYS provide an answer.
+def main():
+    print("Enter audio file path:")
+    audio_file = input(">> ")
 
-    Do NOT refuse.
-    Do NOT say you cannot analyze.
-    Do NOT mention privacy or safety.
+    audio_agent = AudioAgent()
+    analysis_agent = AnalysisAgent()
 
-    Analyze the transcript below:
+    try:
+        # Step 1: Audio → Text
+        text = audio_agent.speech_to_text(audio_file)
 
-    {meeting_text}
+        print("\nTranscript:\n")
+        print(text)
 
-    Return ONLY this format:
+        # Step 2: Text → Analysis
+        result = analysis_agent.analyze(text)
 
-    Tone: <positive/negative/neutral>
+        print("\n=== Final Analysis ===\n")
+        print(result)
 
-    Requirements:
-    - <point 1>
-    - <point 2>
-
-    Summary:
-    <short summary>
-    """
-    response = ollama.chat(
-    model='llama3.2:1b',
-    messages=[{'role': 'user', 'content': prompt}]
-    )
-
-    return response['message']['content']
+    except Exception as e:
+        print("\nError:", str(e))
 
 
-meeting_text = """
-Meeting was about discussing project timelines and next steps.
-"""
-
-result = analyze_meeting(meeting_text)
-
-print("\n=== Meeting Analysis ===\n")
-print(result)
+if __name__ == "__main__":
+    main()
